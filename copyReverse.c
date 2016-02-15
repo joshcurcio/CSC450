@@ -9,7 +9,7 @@
 void main(int argc, char *argv[])
 {
     int count;
-    char ch, ch1;
+    char currChar
     FILE *fp1, *fp2;
  
     if (fp1 = fopen("input.txt", "r"))    
@@ -20,8 +20,8 @@ void main(int argc, char *argv[])
  
         while (count)
         {
-            ch = fgetc(fp1);
-            fputc(ch, fp2);
+            currChar = fgetc(fp1);
+            fputc(currChar, fp2);
             fseek(fp1, -2L, 1);
             count--;
         }
