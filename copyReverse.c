@@ -9,12 +9,12 @@
 void main(int argc, char *argv[])
 {
     int count;
-    char currChar
+    char currChar;
     FILE *fp1, *fp2;
  
-    if (fp1 = fopen("input.txt", "r"))    
+    if (fp1 = fopen(argv[1], "r"))    
     {
-        fp2 = fopen("output.txt", "w");
+        fp2 = fopen(argv[2], "w");
         count = count_characters(fp1); 
         fseek(fp1, -1L, 2);
  
