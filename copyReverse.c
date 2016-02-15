@@ -30,7 +30,7 @@ void main(int argc, char *argv[])
 
 int count_characters(FILE *f) 
 {
-    fseek(f, -1L, 2);
+    fseek(f, -1, 2);
     int last_pos = ftell(f);
     last_pos++;
     return last_pos;
