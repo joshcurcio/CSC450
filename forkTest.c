@@ -8,7 +8,68 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+int main(int argc, char *argv[])
+{
 
+   srand(time(NULL));
+   int numberOfNums = 100;
+	int array[numberOfNums];
+	int length = 0;
+	int data;
+
+	int *sharedArray;
+	int sharedMemoryId;
+	key_t key;
+	int i;
+	size_t sharedArraySize;
+	
+
+	while(length < numberOfNums)
+	{
+		array[length] = rand() % 2;
+		length++;
+	}
+	
+	
+	key = IPC_PRIVATE; // this states the parents id is where the shared array began
+
+
+	sharedArraySize = length * sizeof(int);
+	
+	if ((sharedMemoryId = shmget(key, sharedArraySize, IPC_CREAT | 0666)) == -1) { //create shared memory
+		perror("shmget");
+		exit(1);
+	}
+
+	//connects shared array to the shared memory location
+	if ((sharedArray = shmat(sharedMemoryId, NULL, 0)) == (int *) -1) {
+		perror("shmat");
+		exit(1);
+	}
+
+	for (i = 0; i < length; i++) {
+		sharedArray[i] = array[i];
+	}
+
+	display(sharedArray, length);
+	mergesort(sharedArray, length);
+	printf("//////////////////////done sorting//////////////////////////////\n");
+	display(sharedArray, length);
+
+   //computation is complete, shared array doesnt need to be shared
+	if (shmdt(sharedArray) == -1) {
+		perror("shmdt");
+		exit(1);
+	}
+
+	/* Delete the shared memory segment. */
+	if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
+		perror("shmctl");
+		exit(1);
+	}
+
+	return 0;
+}
 
 void display(int array[], int length)
 {
@@ -125,65 +186,3 @@ void mergesort(int array[], int length)
 	merge(left, leftLength, right, middleIndex);
 }
 
-int main(int argc, char *argv[])
-{
-
-   srand(time(NULL));
-   int numberOfNums = 100;
-	int array[numberOfNums];
-	int length = 0;
-	int data;
-
-	int *sharedArray;
-	int sharedMemoryId;
-	key_t key;
-	int i;
-	size_t sharedArraySize;
-	
-
-	while(length < numberOfNums)
-	{
-		array[length] = rand() % 2;
-		length++;
-	}
-	
-	
-	key = IPC_PRIVATE; // this states the parents id is where the shared array began
-
-
-	sharedArraySize = length * sizeof(int);
-	
-	if ((sharedMemoryId = shmget(key, sharedArraySize, IPC_CREAT | 0666)) == -1) { //create shared memory
-		perror("shmget");
-		exit(1);
-	}
-
-	//connects shared array to the shared memory location
-	if ((sharedArray = shmat(sharedMemoryId, NULL, 0)) == (int *) -1) {
-		perror("shmat");
-		exit(1);
-	}
-
-	for (i = 0; i < length; i++) {
-		sharedArray[i] = array[i];
-	}
-
-	display(sharedArray, length);
-	mergesort(sharedArray, length);
-	printf("//////////////////////done sorting//////////////////////////////\n");
-	display(sharedArray, length);
-
-   //computation is complete, shared array doesnt need to be shared
-	if (shmdt(sharedArray) == -1) {
-		perror("shmdt");
-		exit(1);
-	}
-
-	/* Delete the shared memory segment. */
-	if (shmctl(sharedMemoryId, IPC_RMID, NULL) == -1) {
-		perror("shmctl");
-		exit(1);
-	}
-
-	return 0;
-}
